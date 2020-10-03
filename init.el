@@ -122,25 +122,40 @@
 
 
 ;; language server
+;; resources:
+; https://scalameta.org/metals/docs/editors/emacs.html
+; https://ddavis.io/posts/emacs-python-lsp/
+					; https://translate.google.com/translate?hl=en&sl=auto&tl=en&u=https%3A%2F%2Fglassonion.hatenablog.com%2Fentry%2F2019%2F05%2F11%2F134135
+; https://wiki.crdb.io/wiki/spaces/CRDB/pages/73105658/Ben+s+Go+Emacs+Setup
 (use-package go-mode
   :mode "\\.go$"
   :ensure t
-  )
+  :commands go-mode
+  :config
+  (setq gofmt-command "goimports"  )
+  (add-hook 'before-save-hook 'gofmt-before-save))
 
-(use-package lsp-mode
+(use-package eglot
+  :pin melpa-stable
   :ensure t
-  :commands (lsp lsp-deferred)
-  :hook (
-	 (go-mode . lsp)
-	 (python-mode . lsp)
-	 )
-  )
+  :config
+  (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
+  :hook (go-mode . eglot-ensure))
 
-(use-package lsp-ui
-  :ensure t
-  :commands lsp-ui-mode
-  :init
- )
+;(use-package lsp-mode
+;  :ensure t
+;  :commands (lsp lsp-deferred)
+;  :hook (
+;	 (go-mode . lsp)
+;	 (python-mode . lsp)
+;	 )
+;  )
+
+;(use-package lsp-ui
+;  :ensure t
+;  :commands lsp-ui-mode
+;  :init
+; )
 
 (use-package counsel
   :ensure t
