@@ -52,7 +52,9 @@
 
 
 ;; extra packages
-
+;; https://realpython.com/emacs-the-best-python-editor/
+;; https://www.mortens.dev/blog/emacs-and-the-language-server-protocol/
+;; https://orgmode.org/worg/org-tutorials/orgtutorial_dto.html
 (use-package magit
   :ensure t)
 
