@@ -31,6 +31,10 @@
 ;; no startup message
 (setq inhibit-startup-message t)
 
+;; tabs
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq indent-line-function 'insert-tab)
 
 ;; disable backup
 (setq backup-inhibited t)
@@ -72,7 +76,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -85,6 +89,11 @@
 ;; https://realpython.com/emacs-the-best-python-editor/
 ;; https://www.mortens.dev/blog/emacs-and-the-language-server-protocol/
 ;; https://orgmode.org/worg/org-tutorials/orgtutorial_dto.html
+
+;;(use-package neotree
+;;  :ensure t)
+;;(global-set-key [f7] 'neotree-toggle)
+
 (use-package magit
   :ensure t)
 
@@ -113,11 +122,13 @@
   :config
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  ;;(setq projectile-indexing-method 'native)
   (projectile-mode +1)
-  projectile-project-search-path '("~/Proyects" "~/Proto/")
+  (setq projectile-project-search-path '("~/Proto/" "~Proyects/covid19" "~/Proyects"))
+  (setq projectile-globally-ignored-directories '("node_modules/" "__pycache__/"))
+  (setq projectile-globally-ignored-file-suffixes '(".pyc"))
   )
 
-;(setq projectile-project-search-path '("~/Proyects" "~/Proto/"))
 
 
 
@@ -133,6 +144,9 @@
   :commands go-mode
   :config
   (setq gofmt-command "goimports"  )
+  ;;(setq tab-width 2 indent-tabs-mode 1)
+  ;;(go-eldoc-setup)
+  (local-set-key (kbd "M-.") #'godef-jump)
   (add-hook 'before-save-hook 'gofmt-before-save))
 
 (use-package eglot
@@ -162,6 +176,8 @@
   :after ivy
   :config (counsel-mode))
 
+;; https://sam217pa.github.io/2016/09/13/from-helm-to-ivy/
+;; http://oremacs.com/swiper/
 (use-package ivy
   :ensure t
   :defer 0.1
@@ -171,7 +187,12 @@
   :custom
   (ivy-count-format "(%d/%d) ")
   (ivy-use-virtual-buffers t)
-  :config (ivy-mode)
+  :config
+  (ivy-mode)
+  ;; number of result lines to display
+  (setq ivy-height 10)
+  ;; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer’.
+  (setq ivy-use-virtual-buffers t)
   )
 
 (use-package ivy-rich
@@ -180,10 +201,7 @@
   :custom
   (ivy-virtual-abbreviate 'full
                           ivy-rich-switch-buffer-align-virtual-buffer t
-                          ivy-rich-path-style 'abbrev)
-  :config
-  (ivy-set-display-transformer 'ivy-switch-buffer
-                               'ivy-rich-switch-buffer-transformer))
+                          ivy-rich-path-style 'abbrev))
 
 (use-package swiper
   :ensure t
