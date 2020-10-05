@@ -24,6 +24,15 @@
 ;; increase the number of message in the buffer
 (setq message-log-max 10000)
 
+;; set default size
+(defun fontify-frame (frame)
+  (set-frame-parameter frame 'font "Monospace-11"))
+
+;; Fontify current frame
+(fontify-frame nil)
+;; Fontify any future frames
+(push 'fontify-frame after-make-frame-functions) 
+
 ;; garbage collection threshold
 (setq gc-cons-threshold 100000000
       garbage-collection-messages t)
@@ -36,11 +45,13 @@
 (setq-default tab-width 4)
 (setq indent-line-function 'insert-tab)
 
+;; Let me switch windows with shift-arrows instead of "C-x o" all the time
+(windmove-default-keybindings)
+
 ;; disable backup
 (setq backup-inhibited t)
 ;; disable auto save
 (setq auto-save-default nil)
-
 
 ;; Package configs
 (require 'package)
@@ -76,7 +87,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -90,9 +101,23 @@
 ;; https://www.mortens.dev/blog/emacs-and-the-language-server-protocol/
 ;; https://orgmode.org/worg/org-tutorials/orgtutorial_dto.html
 
+(use-package org
+  :ensure t)
+;;;;Org mode configuration
+;; Enable Org mode
+(require 'org)
+;; Make Org mode work with files ending in .org
+ (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+;; The above is the default in recent emacsen
+(setq org-todo-keywords
+      '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
+
 ;;(use-package neotree
 ;;  :ensure t)
 ;;(global-set-key [f7] 'neotree-toggle)
+
+(use-package all-the-icons
+  :ensure t)
 
 (use-package magit
   :ensure t)
@@ -129,8 +154,14 @@
   (setq projectile-globally-ignored-file-suffixes '(".pyc"))
   )
 
-
-
+  
+;;(use-package elpy
+;;  :ensure t
+;;  :defer t
+;;  :init
+;;  (advice-add 'python-mode :before 'elpy-enable))
+;;(elpy-enable)
+;;(setq elpy-rpc-backend "jedi")
 
 ;; language server
 ;; resources:
@@ -146,15 +177,47 @@
   (setq gofmt-command "goimports"  )
   ;;(setq tab-width 2 indent-tabs-mode 1)
   ;;(go-eldoc-setup)
-  (local-set-key (kbd "M-.") #'godef-jump)
+  ;;(local-set-key (kbd "M-.") #'godef-jump)
   (add-hook 'before-save-hook 'gofmt-before-save))
 
 (use-package eglot
   :pin melpa-stable
   :ensure t
   :config
-  (add-to-list 'eglot-server-programs '(go-mode . ("gopls")))
-  :hook (go-mode . eglot-ensure))
+  (add-to-list 'eglot-server-programs '((go-mode . ("gopls"))
+                                        (python-mode . ("pyls" "-vv" "--log-file" "~/pyls.log"))
+                                        ))
+  :hook (
+         (go-mode . eglot-ensure)
+         (python-mode . eglot-ensure)
+         )
+  )
+
+
+
+
+;;(use-package pyenv-mode
+;;  :ensure t)
+;;(use-package poetry
+;;  :ensure t)
+;; alternative
+;; https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a
+(use-package pipenv
+  :ensure t
+  :hook (python-mode . pipenv-mode)
+  :init
+  (setq
+   pipenv-projectile-after-switch-function
+   #'pipenv-projectile-after-switch-extended))
+
+(use-package py-autopep8
+  :ensure t)
+
+;; autopep8
+;; https://github.com/paetzke/py-autopep8.el
+(defun python-mode-keys ()
+  (local-set-key (kbd "C-c C-f") 'py-autopep8-buffer))
+(add-hook 'python-mode-hook 'python-mode-keys)
 
 ;(use-package lsp-mode
 ;  :ensure t
@@ -229,8 +292,6 @@
 (use-package company-lsp
   :ensure t
   :commands company-lsp)
-
-
 
 ;; Go lang config
 ;; based on
