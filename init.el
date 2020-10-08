@@ -150,7 +150,7 @@
   ;;(setq projectile-indexing-method 'native)
   (projectile-mode +1)
   (setq projectile-project-search-path '("~/Proto/" "~Proyects/covid19" "~/Proyects"))
-  (setq projectile-globally-ignored-directories '("node_modules/" "__pycache__/"))
+  (setq projectile-globally-ignored-directories '("*node_modules" "*__pycache__"))
   (setq projectile-globally-ignored-file-suffixes '(".pyc"))
   )
 
@@ -185,7 +185,7 @@
   :ensure t
   :config
   (add-to-list 'eglot-server-programs '((go-mode . ("gopls"))
-                                        (python-mode . ("pyls" "-vv" "--log-file" "~/pyls.log"))
+                                        (python-mode . ("pyls"))
                                         ))
   :hook (
          (go-mode . eglot-ensure)
@@ -195,28 +195,69 @@
 
 
 
-
+;; https://emacs.stackexchange.com/questions/13489/how-do-i-get-emacs-to-recognize-my-python-3-virtual-environment/52673
+;; in .dir-locals.el add
+;; ((nil . ((pyvenv-activate . "~/repos/my_proj/.venv"))))
 ;;(use-package pyenv-mode
-;;  :ensure t)
+;;  :ensure t
+;;  :config
+;;  (pyenv-mode 1))
+
+(use-package pyvenv
+  :ensure t
+  :init
+  )
+
+;(defun my-python-project-dwim-virtualenv ()
+;  (interactive)
+;  ;; check if .dir-locals.el file already exists and if project-venv-name is in it
+;  ;; prompt user to choose existing venv or create a new one
+;  ;; update .dir-locals.el file
+;  )
+;
+;(add-hook 'focus-in-hook (lambda ()
+;                           (hack-local-variables)
+;                           (if (boundp 'project-venv-name)
+;                           (progn
+;                             (message "Activating %s" project-venv-name)
+;                             (pyvenv-workon project-venv-name))
+;                           (progn (message "Deactivating")
+;                                  (pyvenv-deactivate)))))
+
+; (setq-default mode-line-format (cons '(:exec (concat "venv:" venv-current-name)) mode-line-format))
 ;;(use-package poetry
 ;;  :ensure t)
 ;; alternative
 ;; https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a
-(use-package pipenv
-  :ensure t
-  :hook (python-mode . pipenv-mode)
-  :init
-  (setq
-   pipenv-projectile-after-switch-function
-   #'pipenv-projectile-after-switch-extended))
+;(use-package pipenv
+;  :ensure t
+;  :hook (python-mode . pipenv-mode)
+;  :init
+;  (setq
+;   pipenv-projectile-after-switch-function
+;   #'pipenv-projectile-after-switch-extended))
 
 (use-package py-autopep8
   :ensure t)
 
+;; load isort package
+(load "~/.emacs.d/lisp/py-isort.el")
+
+
+(defun nux/fix-python()
+  "This command run autopep8 and isort."
+  (interactive)
+  (py-autopep8-buffer)
+  (py-isort)
+  )
+
+
 ;; autopep8
 ;; https://github.com/paetzke/py-autopep8.el
 (defun python-mode-keys ()
-  (local-set-key (kbd "C-c C-f") 'py-autopep8-buffer))
+  "Setting keys for python mode."
+  ;;(local-set-key (kbd "C-c C-f") 'py-autopep8-buffer))
+  (local-set-key (kbd "C-c C-f") 'nux/fix-python))
 (add-hook 'python-mode-hook 'python-mode-keys)
 
 ;(use-package lsp-mode

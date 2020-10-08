@@ -1,10 +1,11 @@
-** README of Emacs config 
+* README of Emacs config 
 
-* Links about org mode
+
+** Links about org mode
 https://orgmode.org/worg/org-tutorials/org4beginners.html
 https://sachachua.com/blog/2014/01/tips-learning-org-mode-emacs/
 
-* General configurations
+** General configurations
 https://people.gnome.org/~federico/blog/bringing-my-emacs-from-the-past.html
 https://sam217pa.github.io/2016/09/13/from-helm-to-ivy/
 Intro to init.el
@@ -12,25 +13,40 @@ http://ergoemacs.org/emacs/emacs_make_modern.html
 
 https://cestlaz.github.io/stories/emacs/
 
-* Emac lang
+https://git.sr.ht/~nsh/emacs.d/tree/ad7780b33993b59afa901c00d447d00bb3457055/init.el
+
+https://iqss.github.io/IQSS.emacs/init.html
+
+https://git.jeremydormitzer.com/jdormit/dotfiles/src/commit/8266a2c24a1077ff740e570dba25df7150559b1e/emacs/init.org
+
+** Emac lang
+
 https://tuhdo.github.io/emacs-tutor3.html
 
-* Python configuration
+** Python configuration
 
-Jedi tips https://www.fusionbox.com/blog/detail/exploring-large-and-unfamiliar-python-projects-in-emacs/640/
+[[https://www.fusionbox.com/blog/detail/exploring-large-and-unfamiliar-python-projects-in-emacs/640/][jedi-tips]]
 
-elpy: https://chillaranand.github.io/emacs-py-ide/
+[[https://chillaranand.github.io/emacs-py-ide/][elpy-ide]]
 
-https://ddavis.io/posts/eglot-python-ide/
+[[https://ddavis.io/posts/eglot-python-ide/][eglot-ide]]
 
-* Golang configuration
+[[https://avilpage.com/2015/05/automatically-pep8-your-python-code.html][autopep8]]
+
+[[https://daemons.it/posts/convertir-emacs-en-un-ide-de-python/][emacs-py-ide]]
+
+** Golang configuration
+
 
 https://wiki.crdb.io/wiki/spaces/CRDB/pages/73105658/Ben+s+Go+Emacs+Setup
 https://translate.google.com/translate?hl=en&sl=auto&tl=en&u=https%3A%2F%2Fglassonion.hatenablog.com%2Fentry%2F2019%2F05%2F11%2F134135
 
 https://scalameta.org/metals/docs/editors/emacs.html
 
-* Packages
+** Vue
+[[https://genehack.blog/2020/08/web-mode-eglot-vetur-vuejs-=-happy/][Vuejs]]
+
+** Packages
 https://github.com/leoliu/ggtags
 
 M-x package-install RET web-mode RET
@@ -39,3 +55,6 @@ M-x package-install RET web-mode RET
 (require 'web-mode)
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
+
+*** IN-PROGRESS testing org lalal
+*** TODO [[https://github.com/bbatsov/projectile/issues/1250#issuecomment-578547278][projectile-ignore-files]]
