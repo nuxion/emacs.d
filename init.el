@@ -101,6 +101,11 @@
 ;; https://www.mortens.dev/blog/emacs-and-the-language-server-protocol/
 ;; https://orgmode.org/worg/org-tutorials/orgtutorial_dto.html
 
+(use-package yasnippet
+  :ensure t
+  :init
+  (yas-global-mode 1))
+
 (use-package org
   :ensure t)
 ;;;;Org mode configuration
@@ -112,9 +117,23 @@
 (setq org-todo-keywords
       '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
 
-;;(use-package neotree
-;;  :ensure t)
+(use-package neotree
+  :ensure t)
+(defun neotree-project-dir ()
+    "Open NeoTree using the git root."
+    (interactive)
+    (let ((project-dir (projectile-project-root))
+          (file-name (buffer-file-name)))
+      (neotree-toggle)
+      (if project-dir
+          (if (neo-global--window-exists-p)
+              (progn
+                (neotree-dir project-dir)
+                (neotree-find file-name)))
+        (message "Could not find git project root."))))
 ;;(global-set-key [f7] 'neotree-toggle)
+(global-set-key [f7] 'neotree-project-dir)
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
 (use-package all-the-icons
   :ensure t)
@@ -183,16 +202,19 @@
 (use-package eglot
   :pin melpa-stable
   :ensure t
-  :config
-  (add-to-list 'eglot-server-programs '((go-mode . ("gopls"))
-                                        (python-mode . ("pyls"))
-                                        ))
   :hook (
          (go-mode . eglot-ensure)
          (python-mode . eglot-ensure)
          )
   )
+(setq eglot-server-programs '((go-mode . ("gopls"))))
+(setq eglot-server-programs '((python-mode . ("pyls"))))
 
+  ;;:config
+  ;;(add-to-list 'eglot-server-programs '((go-mode . ("gopls"))))
+
+;;(add-to-list 'eglot-server-programs '((go-mode . ("gopls"))))
+                                        ;;(python-mode . ("pyls")))
 
 
 ;; https://emacs.stackexchange.com/questions/13489/how-do-i-get-emacs-to-recognize-my-python-3-virtual-environment/52673
