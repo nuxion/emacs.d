@@ -13,7 +13,8 @@
   (concat (getenv "PATH")
    ":/home/nuxion/.local/bin:/home/nuxion/go/bin:/usr/local/bin:/bin:/usr/bin"
   )
-)
+  )
+
 ;; general settings
 (use-package xclip
   :demand t
@@ -21,8 +22,16 @@
   (progn
     (xclip-mode 1)))
 
+;; Identtext
+(global-set-key (kbd "C-x =") 'indent-according-to-mode)
+
 ;; increase the number of message in the buffer
 (setq message-log-max 10000)
+;; show fullpath in minibuffer
+(setq frame-title-format
+      (list (format "%s %%S: %%j " (system-name))
+            '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+(setq-default frame-title-format "%b (%f)")
 
 ;; set default size
 (defun fontify-frame (frame)
@@ -40,6 +49,8 @@
 ;; no startup message
 (setq inhibit-startup-message t)
 
+
+
 ;; tabs
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
@@ -54,6 +65,8 @@
 (setq auto-save-default nil)
 
 ;; Package configs
+;; If something fails, do
+;; package-refresh-contents
 (require 'package)
 (setq package-enable-at-startup nil)
 (setq package-archives '(("org"   . "http://orgmode.org/elpa/")
@@ -87,7 +100,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+        '(eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -168,18 +181,17 @@
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   ;;(setq projectile-indexing-method 'native)
   (projectile-mode +1)
-  (setq projectile-project-search-path '("~/Proto/" "~Proyects/covid19" "~/Proyects"))
+  (setq projectile-project-search-path '("/home/nuxion/Proto/" "/home/nuxion/Proyects/covid19" "/home/nuxion/Proyects"))
   (setq projectile-globally-ignored-directories '("*node_modules" "*__pycache__"))
-  (setq projectile-globally-ignored-file-suffixes '(".pyc"))
+  (setq projectile-globally-ignored-file-suffixes '("*.pyc"))
   )
-
   
-;;(use-package elpy
-;;  :ensure t
-;;  :defer t
-;;  :init
-;;  (advice-add 'python-mode :before 'elpy-enable))
-;;(elpy-enable)
+(use-package elpy
+  :ensure t
+  :defer t
+  :init
+  (advice-add 'python-mode :before 'elpy-enable))
+(elpy-enable)
 ;;(setq elpy-rpc-backend "jedi")
 
 ;; language server
@@ -207,8 +219,8 @@
          (python-mode . eglot-ensure)
          )
   )
-(setq eglot-server-programs '((go-mode . ("gopls"))))
-(setq eglot-server-programs '((python-mode . ("pyls"))))
+(setq eglot-server-programs '((go-mode . ("gopls")) (python-mode . ("pyls"))))
+;;(setq eglot-server-programs '((python-mode . ("pyls"))))
 
   ;;:config
   ;;(add-to-list 'eglot-server-programs '((go-mode . ("gopls"))))
@@ -270,7 +282,7 @@
   "This command run autopep8 and isort."
   (interactive)
   (py-autopep8-buffer)
-  (py-isort)
+  (py-isort-buffer)
   )
 
 
@@ -281,6 +293,22 @@
   ;;(local-set-key (kbd "C-c C-f") 'py-autopep8-buffer))
   (local-set-key (kbd "C-c C-f") 'nux/fix-python))
 (add-hook 'python-mode-hook 'python-mode-keys)
+
+
+;; docstring completion
+(use-package python-docstring
+  :ensure t)
+(use-package sphinx-doc
+  :ensure t)
+
+;; (setq py-set-fill-column-p t)
+;;(require-package 'sphinx-doc)
+(add-hook 'python-mode-hook (lambda ()
+                              (sphinx-doc-mode t)))
+
+;;(require-package 'python-docstring)
+(add-hook 'python-mode-hook (lambda ()
+                            (python-docstring-mode)))
 
 ;(use-package lsp-mode
 ;  :ensure t
@@ -295,7 +323,13 @@
 ;  :ensure t
 ;  :commands lsp-ui-mode
 ;  :init
-; )
+                                        ; )
+(use-package eyebrowse
+  :ensure t
+  :config
+    (eyebrowse-mode t)
+     (setq eyebrowse-new-workspace t)
+    )
 
 (use-package counsel
   :ensure t
@@ -336,6 +370,19 @@
          ("C-r" . swiper)))
 
 
+(use-package counsel-etags
+  :ensure t
+  :bind (("C-}" . counsel-etags-find-tag-at-point))
+  :init
+  (add-hook 'prog-mode-hook
+        (lambda ()
+          (add-hook 'after-save-hook
+            'counsel-etags-virtual-update-tags 'append 'local)))
+  :config
+  (setq counsel-etags-update-interval 60)
+  (push "build" counsel-etags-ignore-directories))
+
+
 ;;Company mode is a standard completion package that works well with lsp-mode.
 ;;company-lsp integrates company mode completion with lsp-mode.
 ;;completion-at-point also works out of the box but doesn't support snippets.
@@ -355,6 +402,16 @@
 (use-package company-lsp
   :ensure t
   :commands company-lsp)
+
+(use-package git-gutter
+  :ensure t
+  :diminish ""
+  :config
+  (global-git-gutter-mode t)
+  (setq git-gutter:always-show-gutter t)
+  (bind-key "C-x v =" 'git-gutter:popup-diff)
+  (bind-key "C-x v n" 'git-gutter:next-hunk)
+  (bind-key "C-x v p" 'git-gutter:previous-hunk))
 
 ;; Go lang config
 ;; based on
