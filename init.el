@@ -99,8 +99,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-        '(eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -118,6 +119,21 @@
   :ensure t
   :init
   (yas-global-mode 1))
+
+(use-package yaml-mode
+  :ensure t
+  :config
+  (add-hook 'yaml-mode-hook
+          (lambda ()
+            (define-key yaml-mode-map "\C-m" 'newline-and-indent))))
+
+(use-package highlight-indent-guides
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode)
+  (add-hook 'python-mode-hook 'highlight-indent-guides-mode)
+  )
 
 (use-package org
   :ensure t)
