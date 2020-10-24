@@ -1,7 +1,30 @@
 ;:; init.el --- Summary
 
-;; inspirations
-;; 
+
+;; Package configs
+;; If something fails, do
+;; package-refresh-contents
+(require 'package)
+(setq package-enable-at-startup nil)
+(setq package-archives '(("org"   . "http://orgmode.org/elpa/")
+                         ("gnu"   . "http://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("melpa-stable" . "https://stable.melpa.org/packages/")))
+
+(package-initialize)
+
+;; Bootstrap `use-package`
+;; Next, we'll use use-package to configure our packages better,
+;; in case you don't know, this package provides a macro to allow
+;; you to easily install packages and isolate package configuration
+;; in a way that is both performance-oriented and tidy.
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
+
+
+
 
 ;;; Code:
 (defconst *spell-check-support-enabled* t)
@@ -64,28 +87,6 @@
 ;; disable auto save
 (setq auto-save-default nil)
 
-;; Package configs
-;; If something fails, do
-;; package-refresh-contents
-(require 'package)
-(setq package-enable-at-startup nil)
-(setq package-archives '(("org"   . "http://orgmode.org/elpa/")
-                         ("gnu"   . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ("melpa-stable" . "https://stable.melpa.org/packages/")))
-
-(package-initialize)
-
-;; Bootstrap `use-package`
-;; Next, we'll use use-package to configure our packages better,
-;; in case you don't know, this package provides a macro to allow
-;; you to easily install packages and isolate package configuration
-;; in a way that is both performance-oriented and tidy.
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(require 'use-package)
-
 ;; custom packages
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
@@ -101,7 +102,7 @@
  ;; If there is more than one, they won't work right.
  '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-   '(highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
