@@ -203,13 +203,16 @@
   (setq projectile-globally-ignored-file-suffixes '("*.pyc"))
   )
   
-(use-package elpy
-  :ensure t
-  :defer t
-  :init
-  (advice-add 'python-mode :before 'elpy-enable))
-(elpy-enable)
+;(use-package elpy
+;  :ensure t
+;  :defer t
+;  :init
+;  (advice-add 'python-mode :before 'elpy-enable))
+;(elpy-enable)
 ;;(setq elpy-rpc-backend "jedi")
+
+(require 'python)
+(setq python-shell-interpreter "ipython")
 
 ;; language server
 ;; resources:
