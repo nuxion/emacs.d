@@ -40,10 +40,22 @@
 
 ;; general settings
 (use-package xclip
+  :ensure t
   :demand t
   :config
   (progn
     (xclip-mode 1)))
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(fringe-mode nil nil (fringe))
+ '(fringes-outside-margins t t)
+ '(highlight-indent-guides-method 'bitmap)
+ '(package-selected-packages
+   '(docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 
 ;; Identtext
 (global-set-key (kbd "C-x =") 'indent-according-to-mode)
@@ -95,14 +107,7 @@
   :ensure t
   :config
   (load-theme 'doom-one t))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(highlight-indent-guides-method 'bitmap)
- '(package-selected-packages
-   '(sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -182,6 +187,12 @@
 ;;(add-to-list 'load-path "/home/nuxion/emacs.d/evil")
 (use-package evil
   :ensure t
+  :config
+  (evil-set-initial-state 'ibuffer-mode 'normal)
+  (evil-set-initial-state 'bookmark-bmenu-mode 'normal)
+  (evil-set-initial-state 'dired-mode 'emacs)
+  (evil-set-initial-state 'sunrise-mode 'emacs)
+  (evil-set-initial-state 'neotree-mode 'emacs)
 )
 (require 'evil)
 (evil-mode 1)
@@ -279,8 +290,8 @@
 ;                                  (pyvenv-deactivate)))))
 
 ; (setq-default mode-line-format (cons '(:exec (concat "venv:" venv-current-name)) mode-line-format))
-;;(use-package poetry
-;;  :ensure t)
+(use-package poetry
+  :ensure t)
 ;; alternative
 ;; https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a
 ;(use-package pipenv
@@ -433,6 +444,17 @@
   (bind-key "C-x v n" 'git-gutter:next-hunk)
   (bind-key "C-x v p" 'git-gutter:previous-hunk))
 
+(use-package dockerfile-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
+  (put 'dockerfile-image-name 'safe-local-variable #'stringp)
+  )
+
+(use-package docker-compose-mode
+  :ensure t
+  )
+ 
 ;; Go lang config
 ;; based on
 ;; https://arenzana.org/2019/12/emacs-go-mode-revisited/
