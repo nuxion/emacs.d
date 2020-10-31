@@ -31,6 +31,12 @@
 (when (version<= "26.0.50" emacs-version )
   (global-display-line-numbers-mode))
 
+(defun eshell/clear ()
+  "Clear the eshell buffer."
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+
 ;; paths
 (setenv "PATH"
   (concat (getenv "PATH")
@@ -55,7 +61,7 @@
  '(fringes-outside-margins t t)
  '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-   '(docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 
 ;; Identtext
 (global-set-key (kbd "C-x =") 'indent-according-to-mode)
@@ -248,9 +254,10 @@
   :hook (
          (go-mode . eglot-ensure)
          (python-mode . eglot-ensure)
+         (rust-mode . eglot-ensure)
          )
   )
-(setq eglot-server-programs '((go-mode . ("gopls")) (python-mode . ("pyls"))))
+(setq eglot-server-programs '((go-mode . ("gopls")) (rust-mode . ("rls")) (python-mode . ("pyls"))))
 ;;(setq eglot-server-programs '((python-mode . ("pyls"))))
 
   ;;:config
@@ -454,7 +461,16 @@
 (use-package docker-compose-mode
   :ensure t
   )
- 
+
+(use-package rust-mode
+  :ensure t
+  :config
+  (add-hook 'rust-mode-hook
+            (lambda () (setq indent-tabs-mode nil)))
+  (setq rust-format-on-save t)
+  (define-key rust-mode-map (kbd "C-c C-c") 'rust-run)
+  )
+(require 'rust-mode)
 ;; Go lang config
 ;; based on
 ;; https://arenzana.org/2019/12/emacs-go-mode-revisited/
