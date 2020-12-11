@@ -52,6 +52,13 @@
   (progn
     (xclip-mode 1)))
 
+;; https://stackoverflow.com/questions/4987760/how-to-change-size-of-split-screen-emacs-windows/4988206
+;;(global-set-key (kbd "<C-up>") 'shrink-window)
+;;(global-set-key (kbd "<C-down>") 'enlarge-window)
+(global-set-key (kbd "<C-left>") 'shrink-window-horizontally)
+(global-set-key (kbd "<C-right>") 'enlarge-window-horizontally)
+
+    
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -61,7 +68,7 @@
  '(fringes-outside-margins t t)
  '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-   '(rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 
 ;; Identtext
 (global-set-key (kbd "C-x =") 'indent-according-to-mode)
@@ -175,6 +182,17 @@
 ;;(global-set-key [f7] 'neotree-toggle)
 (global-set-key [f7] 'neotree-project-dir)
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+;; from https://github.com/jaypei/emacs-neotree/issues/262
+;; Set the neo-window-width to the current width of the
+  ;; neotree window, to trick neotree into resetting the
+  ;; width back to the actual window width.
+  ;; Fixes: https://github.com/jaypei/emacs-neotree/issues/262
+  (eval-after-load "neotree"
+    '(add-to-list 'window-size-change-functions
+                  (lambda (frame)
+                    (let ((neo-window (neo-global--get-window)))
+                      (unless (null neo-window)
+                        (setq neo-window-width (window-width neo-window)))))))
 
 (use-package all-the-icons
   :ensure t)
@@ -215,7 +233,7 @@
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   ;;(setq projectile-indexing-method 'native)
   (projectile-mode +1)
-  (setq projectile-project-search-path '("/home/nuxion/Proto/" "/home/nuxion/Proyects/covid19" "/home/nuxion/Proyects"))
+  (setq projectile-project-search-path '("/home/nuxion/Proto/" "/home/nuxion/Projects/covid19" "/home/nuxion/Projects" "/home/nuxion/Documents/notes/"))
   (setq projectile-globally-ignored-directories '("*node_modules" "*__pycache__"))
   (setq projectile-globally-ignored-file-suffixes '("*.pyc"))
   )
@@ -248,6 +266,7 @@
   ;;(local-set-key (kbd "M-.") #'godef-jump)
   (add-hook 'before-save-hook 'gofmt-before-save))
 
+;; look at https://github.com/scalameta/metals/blob/main/docs/editors/emacs.md
 (use-package eglot
   :pin melpa-stable
   :ensure t
@@ -255,9 +274,10 @@
          (go-mode . eglot-ensure)
          (python-mode . eglot-ensure)
          (rust-mode . eglot-ensure)
+         (scala-mode . eglot-ensure)
          )
   )
-(setq eglot-server-programs '((go-mode . ("gopls")) (rust-mode . ("rls")) (python-mode . ("pyls"))))
+(setq eglot-server-programs '((go-mode . ("gopls")) (scala-mode . ("metals-emacs")) (rust-mode . ("rls")) (python-mode . ("pyls"))))
 ;;(setq eglot-server-programs '((python-mode . ("pyls"))))
 
   ;;:config
@@ -433,6 +453,8 @@
   :hook ((emacs-lisp-mode . company-mode)
          (python-mode . company-mode)
          (go-mode . company-mode)
+         (rust-mode . company-mode)
+         (scala-mode . company-mode)
          (typescript-mode . company-mode)
          (restclient-mode . company-mode)
          (js-mode . company-mode)))
@@ -477,6 +499,28 @@
 ;(setq lsp-gopls-staticcheck t)
 ;(setq lsp-eldoc-render-all t)
 ;(setq lsp-gopls-complete-unimported t)
+
+;; Scala setting
+;; Enable scala-mode for highlighting, indentation and motion commands
+(use-package scala-mode
+  :ensure t
+  :interpreter
+    ("scala" . scala-mode))
+
+;; Enable sbt mode for executing sbt commands
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :ensure t
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false"))
+)
 
 
 ;;Set up before-save hooks to format buffer and add/delete imports.

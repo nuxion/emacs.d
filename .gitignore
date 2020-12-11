@@ -4,3 +4,9 @@ url/
 projectile-bookmarks.eld
 elpa/
 *.swp
+elpy/
+\#*
+*.cache
+recentf
+eshell/
+
