@@ -23,7 +23,9 @@
   (package-install 'use-package))
 (require 'use-package)
 
-
+(use-package all-the-icons
+  :ensure t
+ )
 
 
 ;;; Code:
@@ -68,7 +70,7 @@
  '(fringes-outside-margins t t)
  '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-   '(sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 
 ;; Identtext
 (global-set-key (kbd "C-x =") 'indent-according-to-mode)
@@ -91,7 +93,9 @@
 (push 'fontify-frame after-make-frame-functions) 
 
 ;; garbage collection threshold
-(setq gc-cons-threshold 100000000
+;; 1 gb
+;; https://anuragpeshne.github.io/essays/emacsSpeed.html
+(setq gc-cons-threshold 1000000000
       garbage-collection-messages t)
 
 ;; no startup message
@@ -275,9 +279,10 @@
          (python-mode . eglot-ensure)
          (rust-mode . eglot-ensure)
          (scala-mode . eglot-ensure)
+         (js2-mode . eglot-ensure)
          )
   )
-(setq eglot-server-programs '((go-mode . ("gopls")) (scala-mode . ("metals-emacs")) (rust-mode . ("rls")) (python-mode . ("pyls"))))
+(setq eglot-server-programs '((go-mode . ("gopls")) (scala-mode . ("metals-emacs")) (rust-mode . ("rls")) (js2-mode . ("javascript-typescript-stdio")) (python-mode . ("pyls"))))
 ;;(setq eglot-server-programs '((python-mode . ("pyls"))))
 
   ;;:config
@@ -318,7 +323,12 @@
 
 ; (setq-default mode-line-format (cons '(:exec (concat "venv:" venv-current-name)) mode-line-format))
 (use-package poetry
-  :ensure t)
+  :ensure t
+  :config
+    (add-hook 'poetry-tracking-mode-hook (lambda () (remove-hook 'post-command-hook 'poetry-track-virtualenv)))
+    (add-hook 'python-mode-hook 'poetry-track-virtualenv)
+    (add-hook 'projectile-after-switch-project-hook 'poetry-track-virtualenv)
+ )
 ;; alternative
 ;; https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a
 ;(use-package pipenv
@@ -457,7 +467,8 @@
          (scala-mode . company-mode)
          (typescript-mode . company-mode)
          (restclient-mode . company-mode)
-         (js-mode . company-mode)))
+         (js2-mode . company-mode)
+         ))
 
 (use-package company-lsp
   :ensure t
@@ -521,7 +532,50 @@
    ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
    (setq sbt:program-options '("-Dsbt.supershell=false"))
 )
+;; javascript
+; https://jamiecollinson.com/blog/my-emacs-config/
+(setq-default js-indent-level 2)
+(use-package js2-mode
+  :ensure t
+    :mode "\\.js\\'"
+    :config
+    (setq-default js2-ignored-warnings '("msg.extra.trailing.comma")))
 
+;(use-package prettier-js
+;  :ensure t
+;  :config
+;  (add-hook 'js2-mode-hook 'prettier-js-mode)
+;  (add-hook 'web-mode-hook 'prettier-js-mode)
+;  )
+
+(use-package web-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  )
+
+; from https://gist.github.com/ustun/73321bfcb01a8657e5b8
+(defun eslint-fix-file ()
+  (interactive)
+  (message "eslint --fixing the file" (buffer-file-name))
+  (shell-command (concat "eslint --fix " (buffer-file-name))))
+
+(defun eslint-fix-file-and-revert ()
+  (interactive)
+  (eslint-fix-file)
+  (revert-buffer t t))
+
+(add-hook 'js2-mode-hook
+          (lambda ()
+            (add-hook 'after-save-hook #'eslint-fix-file-and-revert)))
+
+(require 'eglot)
+(require 'web-mode)
+(define-derived-mode genehack-vue-mode web-mode "ghVue"
+  "A major mode derived from web-mode, for editing .vue files with LSP support.")
+(add-to-list 'auto-mode-alist '("\\.vue\\'" . genehack-vue-mode))
+(add-hook 'genehack-vue-mode-hook #'eglot-ensure)
+(add-to-list 'eglot-server-programs '(genehack-vue-mode "vls"))
 
 ;;Set up before-save hooks to format buffer and add/delete imports.
 ;;Make sure you don't have other gofmt/goimports hooks enabled.
