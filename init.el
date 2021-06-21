@@ -33,6 +33,10 @@
 (when (version<= "26.0.50" emacs-version )
   (global-display-line-numbers-mode))
 
+;;; close brackets
+;;; https://emacs.stackexchange.com/questions/28857/how-to-complete-brackets-automatically
+(setq electric-pair-preserve-balance nil)
+
 (defun eshell/clear ()
   "Clear the eshell buffer."
   (let ((inhibit-read-only t))
@@ -70,7 +74,7 @@
  '(fringes-outside-margins t t)
  '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-   '(web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(vue-mode jenkinsfile-mode jenkinsfile-mode\.el groovy-mode web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 
 ;; Identtext
 (global-set-key (kbd "C-x =") 'indent-according-to-mode)
@@ -227,6 +231,11 @@
 
 (package-install 'flycheck)
 (global-flycheck-mode)
+;; disable jshint since we prefer eslint checking
+;;(setq-default flycheck-disabled-checkers
+;;  (append flycheck-disabled-checkers
+;;    '(javascript-jshint)))
+
 
 ;; Projectile configuration
 (use-package projectile
@@ -280,9 +289,10 @@
          (rust-mode . eglot-ensure)
          (scala-mode . eglot-ensure)
          (js2-mode . eglot-ensure)
+         (vue-mode . eglot-ensure)
          )
   )
-(setq eglot-server-programs '((go-mode . ("gopls")) (scala-mode . ("metals-emacs")) (rust-mode . ("rls")) (js2-mode . ("javascript-typescript-stdio")) (python-mode . ("pyls"))))
+(setq eglot-server-programs '((go-mode . ("gopls")) (vue-mode . ("vls")) (scala-mode . ("metals-emacs")) (rust-mode . ("rls")) (js2-mode . ("javascript-typescript-stdio")) (python-mode . ("pyls"))))
 ;;(setq eglot-server-programs '((python-mode . ("pyls"))))
 
   ;;:config
@@ -537,25 +547,44 @@
 (setq-default js-indent-level 2)
 (use-package js2-mode
   :ensure t
-    :mode "\\.js\\'"
-    :config
-    (setq-default js2-ignored-warnings '("msg.extra.trailing.comma")))
+  :mode "\\.js\\'"
+  :custom
+  (js2-mode-show-strict-warnings nil)
+  (js2-mode-show-parse-errors nil))
+  ;:config
+  ;;(setq-default js2-ignored-warnings '("msg.extra.trailing.comma")))
+;; use eslint with web-mode for jsx files
+(flycheck-add-mode 'javascript-eslint 'js2-mode)
+(flycheck-add-mode 'javascript-eslint 'ghVue)
+(flycheck-add-mode 'javascript-eslint 'vue-mode)
+(flycheck-add-mode 'javascript-eslint 'ghVue-mode)
+;;(flycheck-disabled-checkers 'javascript-jshint)
+(setq-default flycheck-disabled-checkers '(javascript-jshint))
 
-;(use-package prettier-js
-;  :ensure t
-;  :config
-;  (add-hook 'js2-mode-hook 'prettier-js-mode)
-;  (add-hook 'web-mode-hook 'prettier-js-mode)
-;  )
+;; https://github.com/prettier/prettier-emacs/issues/3
+;; Check if vuejs support fail
+;;(use-package prettier-js
+;;  :ensure t
+;;  :config
+;;  (add-hook 'js2-mode-hook 'prettier-js-mode)
+;;  (add-hook 'web-mode-hook 'prettier-js-mode)
+;;)
 
 (use-package web-mode
   :ensure t
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
   :config
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   )
+;; use eslint with web-mode for jsx files
+(flycheck-add-mode 'javascript-eslint 'web-mode)
 
+; also checks https://github.com/munen/emacs.d/#auto-formatting
 ; from https://gist.github.com/ustun/73321bfcb01a8657e5b8
-(defun eslint-fix-file ()
+(defun eslint-fix-file()
   (interactive)
   (message "eslint --fixing the file" (buffer-file-name))
   (shell-command (concat "eslint --fix " (buffer-file-name))))
@@ -569,13 +598,52 @@
           (lambda ()
             (add-hook 'after-save-hook #'eslint-fix-file-and-revert)))
 
-(require 'eglot)
-(require 'web-mode)
-(define-derived-mode genehack-vue-mode web-mode "ghVue"
-  "A major mode derived from web-mode, for editing .vue files with LSP support.")
-(add-to-list 'auto-mode-alist '("\\.vue\\'" . genehack-vue-mode))
-(add-hook 'genehack-vue-mode-hook #'eglot-ensure)
-(add-to-list 'eglot-server-programs '(genehack-vue-mode "vls"))
+;;(require 'eglot)
+;;(require 'web-mode)
+;;(define-derived-mode genehack-vue-mode web-mode "ghVue"
+;;  "A major mode derived from web-mode, for editing .vue files with LSP support.")
+;;(add-to-list 'auto-mode-alist '("\\.vue\\'" . genehack-vue-mode))
+;;(add-hook 'genehack-vue-mode-hook #'eglot-ensure)
+;;(add-to-list 'eglot-server-programs '(genehack-vue-mode "vls"))
+
+;; https://azzamsa.com/n/vue-emacs/
+(use-package vue-mode
+  :ensure t
+  :mode "\\.vue\\'"
+  :config
+  (add-hook 'vue-mode-hook #'eglot-ensure))
+
+;(use-package vue-html-mode
+;  :mode "\\.vue\\'"
+;)
+
+(require 'mmm-mode)
+(use-package mmm-mode
+  :ensure t
+  :config
+  (add-hook 'mmm-mode-hook
+          (lambda ()
+            (set-face-background 'mmm-default-submode-face nil)))
+  )
+
+
+(use-package groovy-mode
+  :ensure t
+  )
+(add-hook 'groovy-mode-hook
+ (lambda ()
+  (c-set-offset 'label 2)))
+
+(use-package jenkinsfile-mode
+  :ensure t
+ )
+(require 'groovy-mode)
+
+(use-package hcl-mode
+  :ensure t
+  )
+(custom-set-variables
+   '(hcl-indent-level 2))
 
 ;;Set up before-save hooks to format buffer and add/delete imports.
 ;;Make sure you don't have other gofmt/goimports hooks enabled.

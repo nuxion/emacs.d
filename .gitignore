@@ -9,4 +9,4 @@ elpy/
 *.cache
 recentf
 eshell/
-
+tramp
