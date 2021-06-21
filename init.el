@@ -643,7 +643,58 @@
   :ensure t
   )
 (custom-set-variables
-   '(hcl-indent-level 2))
+ '(hcl-indent-level 2))
+
+;(require 'use-package)
+;(use-package tide
+;  :ensure t
+;  :config
+;  (progn
+;    (company-mode +1)
+;    ;; aligns annotation to the right hand side
+;    (setq company-tooltip-align-annotations t)
+;    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+;    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-mode))
+;  ))
+
+(defun nux/ts-mode-hook ()
+ "Set up preferences for typescript mode."
+    (tide-setup)
+
+    (local-set-key (kbd "M-j") 'c-indent-new-comment-line)
+    (local-set-key (kbd "M-RET") 'c-indent-new-comment-line)
+
+    (flycheck-mode +1)
+
+    (eldoc-mode +1)
+
+    (tide-hl-identifier-mode +1)
+    (highlight-symbol-mode -1)
+
+    (company-mode +1)
+
+    (setq typescript-indent-level              2
+            typescript-expr-indent-offset        2
+            company-tooltip-align-annotations    t
+
+            flycheck-check-syntax-automatically  '(save idle-change mode-enabled)
+            flycheck-auto-change-delay           1.5
+
+            whitespace-line-column               120   ;; max line length
+            whitespace-style                     '(face lines-tail trailing))
+(whitespace-mode))
+
+(require 'use-package)
+(use-package typescript-mode
+    :ensure t
+    :mode (("\\.ts\\'" . typescript-mode))
+    :hook
+    (typescript-mode . nux/ts-mode-hook))
+
+(use-package tide :ensure t :pin melpa
+  :delight
+  :commands (tide-setup))
+
 
 ;;Set up before-save hooks to format buffer and add/delete imports.
 ;;Make sure you don't have other gofmt/goimports hooks enabled.
