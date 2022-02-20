@@ -27,6 +27,8 @@
   :ensure t
  )
 
+;; matching parenthesis
+(show-paren-mode 1)
 
 ;;; Code:
 (defconst *spell-check-support-enabled* t)
@@ -311,10 +313,21 @@
 ;;  :config
 ;;  (pyenv-mode 1))
 
+;; configuration based on
+;; https://blog.fredrikmeyer.net/2020/08/26/emacs-python-venv.html
 (use-package pyvenv
   :ensure t
   :init
-  )
+  :config
+  (pyvenv-mode t)
+
+  ;; Set correct Python interpreter
+  (setq pyvenv-post-activate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+  (setq pyvenv-post-deactivate-hooks
+        (list (lambda ()
+                (setq python-shell-interpreter "python3")))))
 
 ;(defun my-python-project-dwim-virtualenv ()
 ;  (interactive)
