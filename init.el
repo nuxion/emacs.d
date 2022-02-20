@@ -72,9 +72,10 @@
  ;; If there is more than one, they won't work right.
  '(fringe-mode nil nil (fringe))
  '(fringes-outside-margins t t)
+ '(hcl-indent-level 2)
  '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-   '(vue-mode jenkinsfile-mode jenkinsfile-mode\.el groovy-mode web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(tide typescript-mode vue-mode jenkinsfile-mode jenkinsfile-mode\.el groovy-mode web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
 
 ;; Identtext
 (global-set-key (kbd "C-x =") 'indent-according-to-mode)
@@ -642,8 +643,7 @@
 (use-package hcl-mode
   :ensure t
   )
-(custom-set-variables
- '(hcl-indent-level 2))
+
 
 ;(require 'use-package)
 ;(use-package tide
