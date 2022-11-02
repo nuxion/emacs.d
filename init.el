@@ -77,7 +77,8 @@
  '(hcl-indent-level 2)
  '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-   '(tide typescript-mode vue-mode jenkinsfile-mode jenkinsfile-mode\.el groovy-mode web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package)))
+   '(python-black tide typescript-mode vue-mode jenkinsfile-mode jenkinsfile-mode\.el groovy-mode web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package))
+ '(warning-suppress-types '((comp) (comp) (comp) (comp) (comp))))
 
 ;; Identtext
 (global-set-key (kbd "C-x =") 'indent-according-to-mode)
@@ -92,9 +93,9 @@
 
 ;; set default size
 (defun fontify-frame (frame)
-  (set-frame-parameter frame 'font "Monospace-11"))
+  (set-frame-parameter frame 'font "Monospace-12"))
 
-;; Fontify current frame
+;; Fontify current frame ++
 (fontify-frame nil)
 ;; Fontify any future frames
 (push 'fontify-frame after-make-frame-functions) 
@@ -102,8 +103,19 @@
 ;; garbage collection threshold
 ;; 1 gb
 ;; https://anuragpeshne.github.io/essays/emacsSpeed.html
-(setq gc-cons-threshold 1000000000
-      garbage-collection-messages t)
+;; (setq gc-cons-threshold 1000000000
+;;      garbage-collection-messages t)
+
+;; http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
+(defun nx-minibuffer-setup-hook ()
+  (setq gc-cons-threshold most-positive-fixnum))
+
+(defun nx-minibuffer-exit-hook ()
+  (setq gc-cons-threshold 800000))
+
+(add-hook 'minibuffer-setup-hook #'nx-minibuffer-setup-hook)
+(add-hook 'minibuffer-exit-hook #'nx-minibuffer-exit-hook)
+
 
 ;; no startup message
 (setq inhibit-startup-message t)
@@ -119,9 +131,14 @@
 (windmove-default-keybindings)
 
 ;; disable backup
-(setq backup-inhibited t)
+;; (setq backup-inhibited t)
 ;; disable auto save
-(setq auto-save-default nil)
+;; (setq auto-save-default nil)
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+
+;; locking of files for different emacs instances
+;; https://stackoverflow.com/questions/5738170/why-does-emacs-create-temporary-symbolic-links-for-modified-files/12974060#12974060
+(setq create-lockfiles nil)
 
 ;; custom packages
 (add-to-list 'load-path "~/.emacs.d/lisp/")
@@ -363,8 +380,14 @@
 ;   pipenv-projectile-after-switch-function
 ;   #'pipenv-projectile-after-switch-extended))
 
-(use-package py-autopep8
-  :ensure t)
+(use-package python-black
+  :ensure t
+  :demand t
+  :after python
+  :hook (python-mode . python-black-on-save-mode-enable-dwim))
+
+;(use-package py-autopep8
+;  :ensure t)
 
 ;; load isort package
 (load "~/.emacs.d/lisp/py-isort.el")
@@ -373,7 +396,8 @@
 (defun nux/fix-python()
   "This command run autopep8 and isort."
   (interactive)
-  (py-autopep8-buffer)
+  ;(py-autopep8-buffer)
+  (python-black-buffer)
   (py-isort-buffer)
   )
 

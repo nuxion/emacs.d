@@ -10,3 +10,5 @@ elpy/
 recentf
 eshell/
 tramp
+backups/
+eln-cache/
