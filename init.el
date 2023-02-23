@@ -77,7 +77,7 @@
  '(hcl-indent-level 2)
  '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-   '(python-black tide typescript-mode vue-mode jenkinsfile-mode jenkinsfile-mode\.el groovy-mode web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package))
+   '(reformatter python-black tide typescript-mode vue-mode jenkinsfile-mode jenkinsfile-mode\.el groovy-mode web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package))
  '(warning-suppress-types '((comp) (comp) (comp) (comp) (comp))))
 
 ;; Identtext
@@ -363,13 +363,13 @@
 ;                                  (pyvenv-deactivate)))))
 
 ; (setq-default mode-line-format (cons '(:exec (concat "venv:" venv-current-name)) mode-line-format))
-(use-package poetry
-  :ensure t
-  :config
-    (add-hook 'poetry-tracking-mode-hook (lambda () (remove-hook 'post-command-hook 'poetry-track-virtualenv)))
-    (add-hook 'python-mode-hook 'poetry-track-virtualenv)
-    (add-hook 'projectile-after-switch-project-hook 'poetry-track-virtualenv)
- )
+; (use-package poetry
+;   :ensure t
+;   :config
+;     (add-hook 'poetry-tracking-mode-hook (lambda () (remove-hook 'post-command-hook 'poetry-track-virtualenv)))
+;     (add-hook 'python-mode-hook 'poetry-track-virtualenv)
+;     (add-hook 'projectile-after-switch-project-hook 'poetry-track-virtualenv)
+;  )
 ;; alternative
 ;; https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a
 ;(use-package pipenv
