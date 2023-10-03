@@ -1,5 +1,3 @@
-;:; init.el --- Summary
-
 
 ;; Package configs
 ;; If something fails, do
@@ -300,19 +298,20 @@
   (add-hook 'before-save-hook 'gofmt-before-save))
 
 ;; look at https://github.com/scalameta/metals/blob/main/docs/editors/emacs.md
-(use-package eglot
-  :pin melpa-stable
-  :ensure t
-  :hook (
-         (go-mode . eglot-ensure)
-         (python-mode . eglot-ensure)
-         (rust-mode . eglot-ensure)
-         (scala-mode . eglot-ensure)
-         (js2-mode . eglot-ensure)
-         (vue-mode . eglot-ensure)
-         )
-  )
-(setq eglot-server-programs '((go-mode . ("gopls")) (vue-mode . ("vls")) (scala-mode . ("metals-emacs")) (rust-mode . ("rls")) (js2-mode . ("javascript-typescript-stdio")) (python-mode . ("pyls"))))
+;; commented since emacs 29.1 
+;; (use-package eglot
+;;   :pin melpa-stable
+;;   :ensure t
+;;   :hook (
+;;          (go-mode . eglot-ensure)
+;;          (python-mode . eglot-ensure)
+;;          (rust-mode . eglot-ensure)
+;;          (scala-mode . eglot-ensure)
+;;          (js2-mode . eglot-ensure)
+;;          (vue-mode . eglot-ensure)
+;;          )
+;;   )
+;; (setq eglot-server-programs '((go-mode . ("gopls")) (vue-mode . ("vls")) (scala-mode . ("metals-emacs")) (rust-mode . ("rls")) (js2-mode . ("javascript-typescript-stdio")) (python-mode . ("pyls"))))
 ;;(setq eglot-server-programs '((python-mode . ("pyls"))))
 
   ;;:config
@@ -412,34 +411,21 @@
 
 
 ;; docstring completion
-(use-package python-docstring
-  :ensure t)
-(use-package sphinx-doc
-  :ensure t)
+;;(use-package python-docstring
+;;  :ensure t)
+;;(use-package sphinx-doc
+;;  :ensure t)
 
 ;; (setq py-set-fill-column-p t)
 ;;(require-package 'sphinx-doc)
-(add-hook 'python-mode-hook (lambda ()
-                              (sphinx-doc-mode t)))
+;;(add-hook 'python-mode-hook (lambda ()
+;;                              (sphinx-doc-mode t)))
 
 ;;(require-package 'python-docstring)
-(add-hook 'python-mode-hook (lambda ()
-                            (python-docstring-mode)))
+;;(add-hook 'python-mode-hook (lambda ()
+;;                            (python-docstring-mode)))
 
-;(use-package lsp-mode
-;  :ensure t
-;  :commands (lsp lsp-deferred)
-;  :hook (
-;	 (go-mode . lsp)
-;	 (python-mode . lsp)
-;	 )
-;  )
-
-;(use-package lsp-ui
-;  :ensure t
-;  :commands lsp-ui-mode
-;  :init
-                                        ; )
+                                       ; )
 (use-package eyebrowse
   :ensure t
   :config
@@ -731,6 +717,46 @@
 (use-package tide :ensure t :pin melpa
   :delight
   :commands (tide-setup))
+
+
+;; Open python files in tree-sitter mode.
+(add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+; Open python files in tree-sitter mode.
+(add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+
+(use-package eglot
+  :ensure t
+  :defer t
+  :bind (:map eglot-mode-map
+              ("C-c C-d" . eldoc)
+              ("C-c C-e" . eglot-rename)
+              ("C-c C-o" . python-sort-imports)
+              ("C-c C-f" . eglot-format-buffer))
+  :hook ((python-ts-mode . eglot-ensure)
+         (python-ts-mode . flyspell-prog-mode)
+         (python-ts-mode . superword-mode)
+         (python-ts-mode . hs-minor-mode)
+         (python-ts-mode . (lambda () (set-fill-column 88))))
+  :config
+  (setq-default eglot-workspace-configuration
+                '((:pylsp . (:configurationSources ["flake8"]
+                             :plugins (
+                                       ;:pycodestyle (:enabled :json-false)
+                                       :mccabe (:enabled :json-false)
+                                       :pyflakes (:enabled :json-false)
+                                       :flake8 (:enabled :json-false
+                                                :maxLineLength 88)
+                                       :ruff (:enabled t
+                                              :lineLength 88)
+                                       ;:pydocstyle (:enabled t
+                                       ;             :convention "numpy")
+                                       :yapf (:enabled :json-false)
+                                       :autopep8 (:enabled :json-false)
+                                       :black (:enabled t
+                                               :line_length 88
+                                               :cache_config t)))))))
+
+
 
 
 ;;Set up before-save hooks to format buffer and add/delete imports.
