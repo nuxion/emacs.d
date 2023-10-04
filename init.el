@@ -75,7 +75,7 @@
  '(hcl-indent-level 2)
  '(highlight-indent-guides-method 'bitmap)
  '(package-selected-packages
-   '(reformatter python-black tide typescript-mode vue-mode jenkinsfile-mode jenkinsfile-mode\.el groovy-mode web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring eglot evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags py-autopep8 all-the-icons company-jedi jedi elpy poetry pyenv-mode pipenv neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package))
+   '(reformatter python-black tide typescript-mode vue-mode jenkinsfile-mode jenkinsfile-mode\.el groovy-mode web-mode prettier-js sbt-mode scala-mode rust-mode docker-compose-mode dockerfile-mode sphinx-doc python-docstring evil yasnippet highlight-indent-guides highlight-indent-guides-mode yaml-mode eyebrowse eyebrowse-mode git-gutter counsel-etags all-the-icons company-jedi jedi elpy poetry neotree ivy-rich counsel go-mode company-lsp company projectile flycheck lsp-ui which-key magit doom-themes use-package))
  '(warning-suppress-types '((comp) (comp) (comp) (comp) (comp))))
 
 ;; Identtext
@@ -331,19 +331,19 @@
 
 ;; configuration based on
 ;; https://blog.fredrikmeyer.net/2020/08/26/emacs-python-venv.html
-(use-package pyvenv
-  :ensure t
-  :init
-  :config
-  (pyvenv-mode t)
-
-  ;; Set correct Python interpreter
-  (setq pyvenv-post-activate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
-  (setq pyvenv-post-deactivate-hooks
-        (list (lambda ()
-                (setq python-shell-interpreter "python3")))))
+;; (use-package pyvenv
+;;   :ensure t
+;;   :init
+;;   :config
+;;   (pyvenv-mode t)
+;; 
+;;   ;; Set correct Python interpreter
+;;   (setq pyvenv-post-activate-hooks
+;;         (list (lambda ()
+;;                 (setq python-shell-interpreter (concat pyvenv-virtual-env "bin/python3")))))
+;;   (setq pyvenv-post-deactivate-hooks
+;;         (list (lambda ()
+;;                 (setq python-shell-interpreter "python3")))))
 
 ;(defun my-python-project-dwim-virtualenv ()
 ;  (interactive)
@@ -379,51 +379,51 @@
 ;   pipenv-projectile-after-switch-function
 ;   #'pipenv-projectile-after-switch-extended))
 
-(use-package python-black
-  :ensure t
-  :demand t
-  :after python
-  :hook (python-mode . python-black-on-save-mode-enable-dwim))
-
-;(use-package py-autopep8
-;  :ensure t)
-
-;; load isort package
-(load "~/.emacs.d/lisp/py-isort.el")
-
-
-(defun nux/fix-python()
-  "This command run autopep8 and isort."
-  (interactive)
-  ;(py-autopep8-buffer)
-  (python-black-buffer)
-  (py-isort-buffer)
-  )
-
-
-;; autopep8
-;; https://github.com/paetzke/py-autopep8.el
-(defun python-mode-keys ()
-  "Setting keys for python mode."
-  ;;(local-set-key (kbd "C-c C-f") 'py-autopep8-buffer))
-  (local-set-key (kbd "C-c C-f") 'nux/fix-python))
-(add-hook 'python-mode-hook 'python-mode-keys)
-
-
-;; docstring completion
-;;(use-package python-docstring
-;;  :ensure t)
-;;(use-package sphinx-doc
-;;  :ensure t)
-
-;; (setq py-set-fill-column-p t)
-;;(require-package 'sphinx-doc)
-;;(add-hook 'python-mode-hook (lambda ()
-;;                              (sphinx-doc-mode t)))
-
-;;(require-package 'python-docstring)
-;;(add-hook 'python-mode-hook (lambda ()
-;;                            (python-docstring-mode)))
+;; (use-package python-black
+;;   :ensure t
+;;   :demand t
+;;   :after python
+;;   :hook (python-mode . python-black-on-save-mode-enable-dwim))
+;; 
+;; ;(use-package py-autopep8
+;; ;  :ensure t)
+;; 
+;; ;; load isort package
+;; (load "~/.emacs.d/lisp/py-isort.el")
+;; 
+;; 
+;; (defun nux/fix-python()
+;;   "This command run autopep8 and isort."
+;;   (interactive)
+;;   ;(py-autopep8-buffer)
+;;   (python-black-buffer)
+;;   (py-isort-buffer)
+;;   )
+;; 
+;; 
+;; ;; autopep8
+;; ;; https://github.com/paetzke/py-autopep8.el
+;; (defun python-mode-keys ()
+;;   "Setting keys for python mode."
+;;   ;;(local-set-key (kbd "C-c C-f") 'py-autopep8-buffer))
+;;   (local-set-key (kbd "C-c C-f") 'nux/fix-python))
+;; (add-hook 'python-mode-hook 'python-mode-keys)
+;; 
+;; 
+;; ;; docstring completion
+;; ;;(use-package python-docstring
+;; ;;  :ensure t)
+;; ;;(use-package sphinx-doc
+;; ;;  :ensure t)
+;; 
+;; ;; (setq py-set-fill-column-p t)
+;; ;;(require-package 'sphinx-doc)
+;; ;;(add-hook 'python-mode-hook (lambda ()
+;; ;;                              (sphinx-doc-mode t)))
+;; 
+;; ;;(require-package 'python-docstring)
+;; ;;(add-hook 'python-mode-hook (lambda ()
+;; ;;                            (python-docstring-mode)))
 
                                        ; )
 (use-package eyebrowse
@@ -719,8 +719,6 @@
   :commands (tide-setup))
 
 
-;; Open python files in tree-sitter mode.
-(add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
 ; Open python files in tree-sitter mode.
 (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
 
@@ -733,9 +731,9 @@
               ("C-c C-o" . python-sort-imports)
               ("C-c C-f" . eglot-format-buffer))
   :hook ((python-ts-mode . eglot-ensure)
-         (python-ts-mode . flyspell-prog-mode)
-         (python-ts-mode . superword-mode)
-         (python-ts-mode . hs-minor-mode)
+         ;(python-ts-mode . flyspell-prog-mode)
+         ;(python-ts-mode . superword-mode)
+         ;(python-ts-mode . hs-minor-mode)
          (python-ts-mode . (lambda () (set-fill-column 88))))
   :config
   (setq-default eglot-workspace-configuration
