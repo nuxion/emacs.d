@@ -397,12 +397,12 @@
 ;;   (interactive)
 ;;   ;(py-autopep8-buffer)
 ;;   (python-black-buffer)
-;;   (py-isort-buffer)
+;;   ;;(py-isort-buffer)
 ;;   )
-;; 
-;; 
-;; ;; autopep8
-;; ;; https://github.com/paetzke/py-autopep8.el
+;; ;; 
+;; ;; 
+;; ;; ;; autopep8
+;; ;; ;; https://github.com/paetzke/py-autopep8.el
 ;; (defun python-mode-keys ()
 ;;   "Setting keys for python mode."
 ;;   ;;(local-set-key (kbd "C-c C-f") 'py-autopep8-buffer))
@@ -496,6 +496,7 @@
   (setq company-minimum-prefix-length 1)
   :hook ((emacs-lisp-mode . company-mode)
          (python-mode . company-mode)
+         (python-ts-mode . company-mode)
          (go-mode . company-mode)
          (rust-mode . company-mode)
          (scala-mode . company-mode)
@@ -729,7 +730,9 @@
               ("C-c C-d" . eldoc)
               ("C-c C-e" . eglot-rename)
               ("C-c C-o" . python-sort-imports)
-              ("C-c C-f" . eglot-format-buffer))
+              ("C-c C-f" . python-black-buffer)
+              ;;("C-c C-f" . eglot-format-buffer)
+              )
   :hook ((python-ts-mode . eglot-ensure)
          ;(python-ts-mode . flyspell-prog-mode)
          ;(python-ts-mode . superword-mode)
